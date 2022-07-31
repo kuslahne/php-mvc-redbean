@@ -6,6 +6,8 @@ use app\core\form\Field;
 use app\models\Login;
 use app\models\User;
 
+use RedBeanPHP\Facade as R;
+
 class Application 
 {
     public static Application $app;
@@ -16,7 +18,8 @@ class Application
     public Database $db;
     public Login $login;
     public Session $session;
-    public ?DbModel $user;
+    //public ?DbModel $user;
+    public $user;
     public $class;
 
     
@@ -31,8 +34,8 @@ class Application
         $this->router = new Router($this->request);
         $this->db = new Database();
         $this->class = $config["class"];
+        $this->user = $user;
         
-
         
         $primaryValue = $this->session->get("user");
         if($primaryValue)

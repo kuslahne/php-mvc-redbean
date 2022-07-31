@@ -1,10 +1,13 @@
 {
-    "name": "bakha/mvc_01",
+    "name": "kuslahne/php-mvc-redbean",
     
     "authors": [
         {
             "name": "BakhadyrovF",
             "email": "BakhadyrovF@gmail.com"
+        },
+        {   "name": "Kuslahne",
+            "email": "wkusnadhi@gmail.com"
         }
     ],
     "autoload": {
@@ -12,5 +15,7 @@
             "app\\": "./"
         }
     },
-    "require": {}
+    "require": {
+        "gabordemooij/redbean": "^5.7"
+    }
 }

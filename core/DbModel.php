@@ -2,7 +2,7 @@
 
 namespace app\core;
 
-
+use RedBeanPHP\Facade as R;
 
 abstract class DbModel extends Model
 {
@@ -11,17 +11,18 @@ abstract class DbModel extends Model
 
     public function save()
     {
-        $tableName = "users";
         $attributes = implode(", ", $this->getAttributes());
         $values = implode(", ", array_map(fn($a) => ":$a", $this->getAttributes()));
-        $statement = $this->prepare("INSERT INTO $tableName ($attributes) VALUES ($values)");
         
+        $user = R::dispense( 'user' );
         foreach($this->getAttributes() as $attribute)
         {
-            $statement->bindValue(":$attribute", $this->hashPassword($attribute, $this->{$attribute}));
+            $user[$attribute] = $this->{$attribute};
+            if($attribute === "password"){
+            	$user[$attribute] = password_hash( $this->{$attribute}, PASSWORD_BCRYPT);
+            }
         }
-        $statement->execute();
-
+        $id = R::store( $user );
     }
 
     protected static function prepare($sql)
@@ -32,22 +33,14 @@ abstract class DbModel extends Model
     protected function hashPassword($attribute, $value)
     {
         return ($attribute === "password") ? password_hash($value, PASSWORD_BCRYPT) : $value;
-        
     }
 
     public static function findOne($data)
     {
-        $attributes = implode(", ", array_keys($data));
-        $tableName = "users";
-        $statement = self::prepare("SELECT * FROM $tableName WHERE $attributes = :$attributes");
-        foreach($data as $attribute => $value)
-        {
-            $statement->bindValue(":$attribute", $value);
-        }
-        $statement->execute();
-        return $statement->fetchObject(static::class);
-        
-        
+        $attributes = implode(", ", array_keys($data));       
+        $user = R::findOne( 'user', " $attributes = ? ", [ $data[$attributes] ] );
+
+        return $user;        
     }
 }
 

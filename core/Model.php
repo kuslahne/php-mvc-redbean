@@ -4,6 +4,7 @@ namespace app\core;
 
 use app\models\Login;
 use app\models\User;
+use RedBeanPHP\Facade as R;
 
 abstract class Model
 {
@@ -82,24 +83,16 @@ abstract class Model
 
                 if($ruleName === self::RULE_UNIQUE)
                 {
-                    $tableName = "users";
-                    $statement = Application::$app->db->pdo->prepare("SELECT * FROM $tableName WHERE $attribute = :$attribute");
-                    $statement->bindValue(":$attribute", $this->{$attribute});
-                    $statement->execute();
-                    $user = $statement->fetchObject();
+                    $user = R::find( 'user', ' email = ? ', [ $this->{$attribute} ] );
                     if($user)
                     {
                         $this->addErrors($attribute, self::RULE_UNIQUE);
                     }
                    
-                }
-
-                
-
+                }             
             }
         }
-
-        
+       
       
         return empty($this->errors);
     }
